@@ -13,12 +13,14 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GeneratePersonalizedOutboundMessageInputSchema = z.object({
-  leadDetails: z
-    .string()
-    .describe('Details about the lead, including name, company, and recent activity.'),
-  productDetails: z
-    .string()
-    .describe('Details about the product or service to promote.'),
+  name: z.string().describe('The name of the lead.'),
+  company: z.string().describe('The company of the lead.'),
+  activity: z.string().describe('The recent activity of the lead.'),
+  score: z.number().describe('The lead score.'),
+  category: z.string().describe('The lead score category (Hot, Warm, Cold).'),
+  product: z.string().describe('The recommended product or service.'),
+  reason: z.string().describe('The reason for the product recommendation.'),
+  upsell: z.string().optional().describe('Optional upsell opportunity.'),
   tone: z
     .enum(['friendly', 'professional'])
     .describe('The desired tone of the message.'),
@@ -29,7 +31,16 @@ export type GeneratePersonalizedOutboundMessageInput = z.infer<
 >;
 
 const GeneratePersonalizedOutboundMessageOutputSchema = z.object({
-  message: z.string().describe('The generated personalized outbound message.'),
+  subject: z.string().describe('Personalized subject line for email.'),
+  body: z
+    .string()
+    .describe('Main message body including the upsell suggestion.'),
+  variant_2: z
+    .string()
+    .describe('Alternate message body with different wording or approach.'),
+  suggested_channel: z
+    .enum(['email', 'whatsapp'])
+    .describe('The suggested channel for the message.'),
 });
 export type GeneratePersonalizedOutboundMessageOutput = z.infer<
   typeof GeneratePersonalizedOutboundMessageOutputSchema
@@ -45,18 +56,30 @@ const generatePersonalizedOutboundMessagePrompt = ai.definePrompt({
   name: 'generatePersonalizedOutboundMessagePrompt',
   input: {schema: GeneratePersonalizedOutboundMessageInputSchema},
   output: {schema: GeneratePersonalizedOutboundMessageOutputSchema},
-  prompt: `You are an AI assistant designed to generate personalized outbound messages for leads.
+  prompt: `You are an expert sales assistant for a software company. Your task is to generate a **personalized outbound message** for a lead, including a friendly upsell suggestion for our software services.
 
-  Based on the following lead details:
-  {{leadDetails}}
+Lead Details:
+- Name: {{name}}
+- Company: {{company}}
+- Recent activity: {{activity}}
+- Lead score: {{score}} ({{category}})
+- Recommended product/service: {{product}} (reason: {{reason}})
+- Upsell opportunity: {{upsell}} (optional; additional software services that could benefit the client)
 
-  And the following product details:
-  {{productDetails}}
+Requirements:
+- Tone: {{tone}}
+- Channel: {{channel}}
+- Message length: 2–4 sentences
+- Include the upsell naturally, highlighting value or complementary benefits
+- Provide at least **2 variants** for A/B testing
 
-  Generate a personalized outbound message with a {{tone}} tone for {{channel}}.
-  Return the message as a JSON object with a single 'message' field.
-  Make the message engaging and tailored to the lead's specific interests and needs.
-  The message should be concise and direct.
+Return JSON in this format:
+{
+  "subject": "Personalized subject line for email",
+  "body": "Main message body including the upsell suggestion",
+  "variant_2": "Alternate message body with different wording or approach",
+  "suggested_channel": "email|whatsapp"
+}
   `,
 });
 
@@ -71,3 +94,4 @@ const generatePersonalizedOutboundMessageFlow = ai.defineFlow(
     return output!;
   }
 );
+```
