@@ -19,7 +19,7 @@ export type Lead = {
 };
 
 export type UpsellSuggestion = {
-  id: string;
+  id?: string;
   productName: string;
   reason: string;
   confidence: number; // 0-1

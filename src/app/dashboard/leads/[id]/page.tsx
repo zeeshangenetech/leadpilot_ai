@@ -40,7 +40,7 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
         <div className="lg:col-span-3 flex flex-col gap-6">
           <div className="grid gap-6 md:grid-cols-2">
             <ScoreCard lead={lead} />
-            <UpsellCard leadId={lead.id} />
+            <UpsellCard lead={lead} />
           </div>
           <MessageGenerator lead={lead} />
         </div>

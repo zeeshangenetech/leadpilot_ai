@@ -7,6 +7,7 @@ import {
 } from '@/ai/flows/generate-personalized-outbound-messages';
 import type { SmtpSettings } from '@/lib/settings-service';
 import nodemailer from 'nodemailer';
+import { generateUpsellSuggestions, type GenerateUpsellSuggestionsInput, type GenerateUpsellSuggestionsOutput } from '@/ai/flows/generate-upsell-suggestions';
 
 export async function generateMessageAction(
   input: GeneratePersonalizedOutboundMessageInput
@@ -67,4 +68,20 @@ export async function sendEmailAction(input: SendEmailInput): Promise<{ success:
         console.error('Error sending email:', error);
         return { success: false, error: 'Failed to send email.' };
     }
+}
+
+export async function generateUpsellSuggestionsAction(
+  input: GenerateUpsellSuggestionsInput
+): Promise<{ success: true; data: GenerateUpsellSuggestionsOutput } | { success: false; error: string }> {
+  try {
+    const result = await generateUpsellSuggestions(input);
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Error generating upsell suggestions:', error);
+    return {
+      success: false,
+      error:
+        'Failed to generate upsell suggestions. Please check the AI service configuration.',
+    };
+  }
 }
