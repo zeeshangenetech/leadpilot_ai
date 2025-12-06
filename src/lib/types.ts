@@ -15,6 +15,7 @@ export type Lead = {
   linkedinProfile?: string;
   website?: string;
   recentActivity: string;
+  raw_data?: Record<string, any>; // To store original data for scoring
 };
 
 export type UpsellSuggestion = {
