@@ -5,6 +5,7 @@ import { getLeads } from '@/lib/leads-service';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LeadsByCategoryChart } from './_components/leads-by-category-chart';
 import { LeadsBySourceChart } from './_components/leads-by-source-chart';
+import LeadsTable from './_components/leads-table';
 import { Users, Mail, BarChart3, LineChart } from 'lucide-react';
 import { getStats } from '@/lib/stats-service';
 
@@ -90,6 +91,19 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Leads Table Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-main-pr">
+            <Users className="h-5 w-5 text-muted-foreground" />
+            <span>Recent Leads</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <LeadsTable leads={leads} />
+        </CardContent>
+      </Card>
 
     </div>
   );
