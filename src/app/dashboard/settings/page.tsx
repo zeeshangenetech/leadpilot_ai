@@ -17,8 +17,21 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { getSettings, saveSettings, type SmtpSettings } from '@/lib/settings-service';
-import { useEffect } from 'react';
-import { Mail } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Mail, Trash2, Loader2, DatabaseZap } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { deleteAllLeads } from '@/lib/leads-service';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   host: z.string().min(1, 'Host is required.'),
@@ -30,6 +43,9 @@ const formSchema = z.object({
 
 export default function SettingsPage() {
   const { toast } = useToast();
+  const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,6 +70,27 @@ export default function SettingsPage() {
       title: 'Settings Saved',
       description: 'Your SMTP settings have been updated successfully.',
     });
+  }
+
+  async function handleDeleteAllData() {
+    setIsDeleting(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate async operation
+      deleteAllLeads();
+      toast({
+        title: 'Data Deleted',
+        description: 'All lead data has been successfully deleted.',
+      });
+      router.push('/dashboard');
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not delete lead data.',
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   return (
@@ -148,6 +185,51 @@ export default function SettingsPage() {
                         <Button type="submit">Save Settings</Button>
                     </form>
                 </Form>
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <DatabaseZap className="h-5 w-5 text-destructive" />
+                    <span>Data Management</span>
+                </CardTitle>
+                <CardDescription>
+                    Manage your application&apos;s data. This action cannot be undone.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                 <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="destructive">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete All Leads
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete all of your lead data from your browser&apos;s local storage.
+                        </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                        <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDeleteAllData}
+                            disabled={isDeleting}
+                            className="bg-destructive hover:bg-destructive/90"
+                        >
+                            {isDeleting ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                                <Trash2 className="mr-2 h-4 w-4" />
+                            )}
+                            Yes, delete all data
+                        </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </CardContent>
         </Card>
     </div>

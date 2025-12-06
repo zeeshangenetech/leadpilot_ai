@@ -61,3 +61,14 @@ export function addLeads(newLeads: Lead[]): void {
   const updatedLeads = [...allLeads, ...newLeadsWithUniqueIds];
   saveLeads(updatedLeads);
 }
+
+export function deleteAllLeads(): void {
+    if (typeof window === 'undefined') {
+        return;
+    }
+    try {
+        window.localStorage.removeItem(LEADS_STORAGE_KEY);
+    } catch (error) {
+        console.error('Error deleting leads from localStorage:', error);
+    }
+}
