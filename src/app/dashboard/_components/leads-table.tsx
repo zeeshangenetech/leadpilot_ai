@@ -140,7 +140,7 @@ export default function LeadsTable({ leads }: { leads: Lead[] }) {
       <CardContent className="p-0">
         <div className="flex items-center gap-4 p-4 border-b">
           <Input
-            placeholder="Filter by name, email..."
+            placeholder="Filter by name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="max-w-sm"
