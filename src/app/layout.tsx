@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'LeadPilot AI',
+  title: 'Syntax Squad',
   description: 'Manage and engage your leads with AI-powered tools.',
 };
 

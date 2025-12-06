@@ -92,11 +92,11 @@ export default function DashboardLayout({
               <div className="flex items-center gap-3 px-2 py-3">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src="https://picsum.photos/seed/user/40/40" data-ai-hint="person" />
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarFallback>SS</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col truncate group-data-[state=collapsed]:hidden">
-                  <span className="font-semibold text-sm text-sidebar-foreground truncate">John Doe</span>
-                  <span className="text-xs text-sidebar-foreground/70 truncate">john.doe@example.com</span>
+                  <span className="font-semibold text-sm text-sidebar-foreground truncate">Syntax Squad</span>
+                  <span className="text-xs text-sidebar-foreground/70 truncate">admin@syntaxsquad.com</span>
                 </div>
               </div>
             </SidebarMenuItem>
@@ -120,7 +120,7 @@ export default function DashboardLayout({
             </Button>
             <Avatar className="h-9 w-9 hidden md:flex">
               <AvatarImage src="https://picsum.photos/seed/user-avatar/36/36" data-ai-hint="person" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarFallback>SS</AvatarFallback>
             </Avatar>
           </div>
         </header>
