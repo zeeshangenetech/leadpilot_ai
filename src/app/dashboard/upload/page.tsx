@@ -1,3 +1,4 @@
+
 'use client';
 import { useState } from 'react';
 import { UploadCloud, Loader2, CheckCircle } from 'lucide-react';
@@ -8,7 +9,7 @@ import Papa from 'papaparse';
 import type { Lead } from '@/lib/types';
 import LeadsTable from '../_components/leads-table';
 import { useToast } from '@/hooks/use-toast';
-import { addLeads, getLeads } from '@/lib/leads-service';
+import { addLeads } from '@/lib/leads-service';
 import { useRouter } from 'next/navigation';
 
 export default function UploadPage() {
@@ -39,7 +40,7 @@ export default function UploadPage() {
             ].filter(Boolean);
 
             const lead: Lead = {
-              id: row.lead_id || `temp-id-${index}`,
+              id: row.lead_id || `temp-id-${Date.now()}-${index}`,
               name: `${row['lead_profile/first_name']} ${row['lead_profile/last_name']}`,
               email: row['lead_profile/email'],
               company: row['company_profile/name'],

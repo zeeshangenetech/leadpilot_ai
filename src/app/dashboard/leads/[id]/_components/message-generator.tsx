@@ -224,4 +224,3 @@ export default function MessageGenerator({ lead }: { lead: Lead }) {
     </Card>
   );
 }
-```

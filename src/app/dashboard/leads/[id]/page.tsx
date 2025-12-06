@@ -1,4 +1,8 @@
+
+'use client';
+import { useState, useEffect } from 'react';
 import { getLeadById } from '@/lib/leads-service';
+import type { Lead } from '@/lib/types';
 import { notFound } from 'next/navigation';
 import LeadHeader from './_components/lead-header';
 import LeadInfoCard from './_components/lead-info-card';
@@ -9,7 +13,17 @@ import ActivityFeed from './_components/activity-feed';
 import { Separator } from '@/components/ui/separator';
 
 export default function LeadDetailPage({ params }: { params: { id: string } }) {
-  const lead = getLeadById(params.id);
+  const [lead, setLead] = useState<Lead | null | undefined>(undefined);
+
+  useEffect(() => {
+    const foundLead = getLeadById(params.id);
+    setLead(foundLead);
+  }, [params.id]);
+
+  if (lead === undefined) {
+    return <div>Loading...</div>;
+  }
+  
   if (!lead) {
     notFound();
   }
