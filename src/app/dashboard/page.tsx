@@ -6,19 +6,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LeadsByCategoryChart } from './_components/leads-by-category-chart';
 import { LeadsBySourceChart } from './_components/leads-by-source-chart';
 import { Users, Mail, BarChart3, LineChart } from 'lucide-react';
+import { getStats } from '@/lib/stats-service';
 
 export default function DashboardPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [messagesSent, setMessagesSent] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setLeads(getLeads());
+    setMessagesSent(getStats().messagesSent);
     setIsLoading(false);
   }, []);
 
   const totalLeads = leads.length;
   const hotLeads = leads.filter(l => l.scoreCategory === 'Hot').length;
-  const messagesSent = 0; // Placeholder for now
 
   if (isLoading) {
     return <div>Loading dashboard...</div>;

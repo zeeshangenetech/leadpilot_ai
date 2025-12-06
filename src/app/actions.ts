@@ -8,6 +8,7 @@ import {
 import type { SmtpSettings } from '@/lib/settings-service';
 import nodemailer from 'nodemailer';
 import { generateUpsellSuggestions, type GenerateUpsellSuggestionsInput, type GenerateUpsellSuggestionsOutput } from '@/ai/flows/generate-upsell-suggestions';
+import { incrementMessagesSent } from '@/lib/stats-service';
 
 export async function generateMessageAction(
   input: GeneratePersonalizedOutboundMessageInput
@@ -63,6 +64,9 @@ export async function sendEmailAction(input: SendEmailInput): Promise<{ success:
             subject: subject,
             html: body.replace(/\n/g, '<br />'),
         });
+        // This is not a stateful server, so we can't reliably increment a counter here
+        // without a database. The client will have to manage this state.
+        // A better approach would be to return success and have the client update its state.
         return { success: true };
     } catch (error) {
         console.error('Error sending email:', error);

@@ -15,6 +15,7 @@ import { generateMessageAction, sendEmailAction } from '@/app/actions';
 import { BotMessageSquare, Copy, Send, Loader2, Mail } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { getSettings } from '@/lib/settings-service';
+import { incrementMessagesSent } from '@/lib/stats-service';
 
 const formSchema = z.object({
   cta: z.string().min(1, 'Call to action is required.'),
@@ -106,6 +107,7 @@ export default function MessageGenerator({ lead }: { lead: Lead }) {
     });
 
     if (result.success) {
+      incrementMessagesSent();
       toast({
         title: 'Email Sent!',
         description: `Message sent to ${lead.name}.`,
