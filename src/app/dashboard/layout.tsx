@@ -28,6 +28,7 @@ import { Input } from '@/components/ui/input';
 const navItems = [
   { href: '/dashboard', icon: Users, label: 'Leads' },
   { href: '/dashboard/upload', icon: Upload, label: 'Upload Leads' },
+  { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
 ];
 
 export default function DashboardLayout({
@@ -71,18 +72,22 @@ export default function DashboardLayout({
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={{children: 'Settings'}}>
-                <Link href="#">
+             <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/dashboard/settings'}
+                tooltip={{children: 'Settings'}}
+              >
+                <Link href="/dashboard/settings">
                   <Settings />
                   <span>Settings</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarContent>
+        <SidebarFooter>
+          <SidebarMenu>
             <SidebarMenuItem>
               <div className="flex items-center gap-3 px-2 py-3">
                 <Avatar className="h-10 w-10">
