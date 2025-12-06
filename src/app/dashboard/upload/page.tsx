@@ -15,10 +15,15 @@ import { useRouter } from 'next/navigation';
 type CsvRow = Record<string, any>;
 
 const detectSource = (headers: string[]): 'LinkedIn' | 'Upwork' | 'Freelancer' | 'Email' | 'Unknown' => {
-  if (headers.includes('lead_id') && headers.includes('demand_signal/post_url')) return 'LinkedIn';
-  if (headers.includes('job_id') && headers.includes('job_post_data/url') && headers.some(h => h.startsWith('client_engagement'))) return 'Upwork';
-  if (headers.includes('job_id') && headers.includes('avg_bid_USD')) return 'Freelancer';
-  if (headers.includes('received_date') && headers.includes('tech_stack_preference')) return 'Email';
+  const lowerCaseHeaders = headers.map(h => h.toLowerCase());
+  // LinkedIn is very specific with its columns
+  if (lowerCaseHeaders.includes('lead_id') && lowerCaseHeaders.includes('demand_signal/post_url')) return 'LinkedIn';
+  // Freelancer has avg_bid_usd
+  if (lowerCaseHeaders.includes('job_id') && lowerCaseHeaders.includes('avg_bid_usd')) return 'Freelancer';
+  // Upwork has a bunch of specific columns
+  if (lowerCaseHeaders.includes('job_id') && lowerCaseHeaders.includes('job_post_data/url') && lowerCaseHeaders.some(h => h.startsWith('client_engagement'))) return 'Upwork';
+  // Email has a more simple structure
+  if (lowerCaseHeaders.includes('received_date') && lowerCaseHeaders.includes('tech_stack_preference')) return 'Email';
   return 'Unknown';
 };
 
@@ -86,7 +91,7 @@ const normalizeFreelancer = (row: CsvRow, index: number): Lead => ({
 
 const normalizeEmail = (row: CsvRow, index: number): Lead => ({
     id: `temp-email-${Date.now()}-${index}`,
-    name: row.name,
+    name: row.name || `Email Lead ${index + 1}`,
     email: row.email,
     company: row.company,
     avatar: `https://picsum.photos/seed/email${index}/100/100`,
