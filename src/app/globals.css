@@ -118,3 +118,11 @@ div[data-sidebar="content"]{
   display: flex;
   gap:15px;
 }
+
+[data-sidebar="sidebar"] {
+padding:15px;}
+
+[data-sidebar="header"] .flex .flex-shrink-0 svg{
+      height: 50px;
+    width: 200px;
+}
