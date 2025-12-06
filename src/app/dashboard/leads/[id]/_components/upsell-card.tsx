@@ -37,7 +37,7 @@ export default function UpsellCard({ leadId }: { leadId: string }) {
           <Lightbulb className="h-5 w-5 text-amber-500" />
           <span>Upsell Opportunities</span>
         </CardTitle>
-        <CardDescription>Based on purchase history and activity</CardDescription>
+        <CardDescription>Suggested based on lead score category.</CardDescription>
       </CardHeader>
       <CardContent>
         {suggestions.length > 0 ? (
