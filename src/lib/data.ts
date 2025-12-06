@@ -1,6 +1,6 @@
 import type { Lead, UpsellSuggestion } from './types';
 
-export const leads: Lead[] = [
+export const initialLeads: Lead[] = [
   {
     id: '1',
     name: 'Alice Johnson',
@@ -128,13 +128,16 @@ const upsellSuggestions: UpsellSuggestion[] = [
     }
 ];
 
-export function getLeads() {
-  return leads;
-}
+// This is now imported from leads-service
+// export function getLeads() {
+//   return leads;
+// }
 
-export function getLeadById(id: string): Lead | undefined {
-  return leads.find((lead) => lead.id === id);
-}
+// This is now imported from leads-service
+// export function getLeadById(id: string): Lead | undefined {
+//   return leads.find((lead) => lead.id === id);
+// }
+import { getLeadById } from './leads-service';
 
 export function getUpsellSuggestionsByLeadId(leadId: string): UpsellSuggestion[] {
     // In a real app, this would be a dynamic lookup based on the lead's data.

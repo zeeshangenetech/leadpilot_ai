@@ -8,17 +8,15 @@ import Papa from 'papaparse';
 import type { Lead } from '@/lib/types';
 import LeadsTable from '../_components/leads-table';
 import { useToast } from '@/hooks/use-toast';
-
-// Helper to get nested properties from an object
-const getProperty = (obj: any, path: string) => {
-  return path.split('/').reduce((o, i) => (o ? o[i] : undefined), obj);
-};
+import { addLeads, getLeads } from '@/lib/leads-service';
+import { useRouter } from 'next/navigation';
 
 export default function UploadPage() {
   const [isParsing, setIsParsing] = useState(false);
   const [parsedLeads, setParsedLeads] = useState<Lead[]>([]);
   const [fileName, setFileName] = useState('');
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -30,7 +28,7 @@ export default function UploadPage() {
       Papa.parse(file, {
         header: true,
         skipEmptyLines: true,
-        transformHeader: header => header.replace(/ /g, ''), // Remove spaces from headers
+        transformHeader: header => header.trim().replace(/ /g, ''), // Remove spaces from headers
         complete: (results) => {
           const leadsData: Lead[] = results.data.map((row: any, index: number) => {
             const projectTypes = [
@@ -59,13 +57,14 @@ export default function UploadPage() {
               recentActivity: row['demand_signal/post_snippet'],
             };
             return lead;
-          }).filter(lead => lead.name && lead.email);
+          }).filter(lead => lead.id && lead.name && lead.email);
 
+          addLeads(leadsData);
           setParsedLeads(leadsData);
           setIsParsing(false);
           toast({
             title: 'Upload Successful',
-            description: `${leadsData.length} leads have been parsed.`,
+            description: `${leadsData.length} leads have been parsed and added.`,
           })
         },
         error: (error: any) => {
@@ -79,6 +78,10 @@ export default function UploadPage() {
         }
       });
     }
+  };
+
+  const handleConfirm = () => {
+    router.push('/dashboard');
   };
 
 
@@ -137,7 +140,10 @@ export default function UploadPage() {
 
       {parsedLeads.length > 0 && (
         <div className="flex flex-col gap-6">
-            <h2 className="text-2xl font-bold tracking-tight">Uploaded Leads ({parsedLeads.length})</h2>
+            <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold tracking-tight">Uploaded Leads ({parsedLeads.length})</h2>
+                <Button onClick={handleConfirm}>Confirm and View All Leads</Button>
+            </div>
             <LeadsTable leads={parsedLeads} />
         </div>
       )}

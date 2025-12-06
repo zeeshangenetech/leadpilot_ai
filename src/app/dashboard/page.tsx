@@ -1,4 +1,4 @@
-import { getLeads } from '@/lib/data';
+import { getLeads } from '@/lib/leads-service';
 import LeadsTable from './_components/leads-table';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, FileDown } from 'lucide-react';

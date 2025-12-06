@@ -1,4 +1,4 @@
-import { getLeadById } from '@/lib/data';
+import { getLeadById } from '@/lib/leads-service';
 import { notFound } from 'next/navigation';
 import LeadHeader from './_components/lead-header';
 import LeadInfoCard from './_components/lead-info-card';
