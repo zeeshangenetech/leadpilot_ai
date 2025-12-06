@@ -27,7 +27,7 @@ type GeneratedMessage = {
     body: string;
 }
 
-export default function MessageGenerator({ lead }: { lead: Lead }) {
+export default function MessageGenerator({ lead, onEmailSent }: { lead: Lead, onEmailSent: () => void }) {
   const [generatedMessage, setGeneratedMessage] = useState<GeneratedMessage | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -108,9 +108,10 @@ export default function MessageGenerator({ lead }: { lead: Lead }) {
 
     if (result.success) {
       incrementMessagesSent();
+      onEmailSent(); // Notify parent component
       toast({
         title: 'Email Sent!',
-        description: `Message sent to ${lead.name}.`,
+        description: `Message sent to ${lead.name}. Status updated to "Contacted".`,
       });
     } else {
       toast({
@@ -205,7 +206,7 @@ export default function MessageGenerator({ lead }: { lead: Lead }) {
                 </div>
                  <Button className="mt-4" onClick={handleSendMessage} disabled={isSending}>
                 {isSending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
-                Send Email
+                Send Email & Mark as Contacted
                 </Button>
             </div>
         )}

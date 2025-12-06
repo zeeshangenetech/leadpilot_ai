@@ -24,7 +24,7 @@ const detectSource = (headers: string[]): 'LinkedIn' | 'Upwork' | 'Freelancer' |
   return 'Unknown';
 };
 
-const normalizeLinkedIn = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation'> => ({
+const normalizeLinkedIn = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation' | 'status'> => ({
   id: row.lead_id || `temp-linkedin-${Date.now()}-${index}`,
   name: `${row['lead_profile/first_name'] || ''} ${row['lead_profile/last_name'] || ''}`.trim(),
   email: row['lead_profile/email'],
@@ -46,7 +46,7 @@ const normalizeLinkedIn = (row: CsvRow, index: number): Omit<Lead, 'score' | 'sc
   raw_data: row,
 });
 
-const normalizeUpwork = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation'> => ({
+const normalizeUpwork = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation' | 'status'> => ({
   id: row.job_id || `temp-upwork-${Date.now()}-${index}`,
   name: `Upwork: ${row['job_post_data/title']}`.substring(0, 50),
   email: 'not-available@upwork.com',
@@ -65,7 +65,7 @@ const normalizeUpwork = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scor
   raw_data: row,
 });
 
-const normalizeFreelancer = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation'> => ({
+const normalizeFreelancer = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation' | 'status'> => ({
     id: row.job_id || `temp-freelancer-${Date.now()}-${index}`,
     name: `Freelancer: ${row.title}`.substring(0, 50),
     email: 'not-available@freelancer.com',
@@ -80,7 +80,7 @@ const normalizeFreelancer = (row: CsvRow, index: number): Omit<Lead, 'score' | '
     raw_data: row,
 });
 
-const normalizeEmail = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation'> => ({
+const normalizeEmail = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation' | 'status'> => ({
     id: `temp-email-${Date.now()}-${index}`,
     name: row.name || `Email Lead ${index + 1}`,
     email: row.email,
@@ -97,7 +97,7 @@ const normalizeEmail = (row: CsvRow, index: number): Omit<Lead, 'score' | 'score
 
 const normalizeRow = (source: 'LinkedIn' | 'Upwork' | 'Freelancer' | 'Email' | 'Unknown', row: CsvRow, index: number): Lead | null => {
     try {
-        let normalizedData: Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation'> | null = null;
+        let normalizedData: Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation' | 'status'> | null = null;
         switch (source) {
             case 'LinkedIn':
                 normalizedData = normalizeLinkedIn(row, index);
@@ -122,7 +122,8 @@ const normalizeRow = (source: 'LinkedIn' | 'Upwork' | 'Freelancer' | 'Email' | '
 
         return {
             ...normalizedData,
-            ...scoringResult
+            ...scoringResult,
+            status: 'New',
         };
 
     } catch (e) {
