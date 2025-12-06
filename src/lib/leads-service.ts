@@ -17,6 +17,7 @@ function getStoredLeads(): Lead[] {
       return parsedLeads.map(lead => ({
         ...lead,
         lastActivity: new Date(lead.lastActivity),
+        status: lead.status || 'New', // Add default status for older data
       }));
     }
   } catch (error) {
@@ -51,6 +52,15 @@ export function getLeads(): Lead[] {
 export function getLeadById(id: string): Lead | undefined {
   const allLeads = getStoredLeads();
   return allLeads.find((lead) => lead.id === id);
+}
+
+export function updateLead(updatedLead: Lead): void {
+  const allLeads = getStoredLeads();
+  const index = allLeads.findIndex((lead) => lead.id === updatedLead.id);
+  if (index !== -1) {
+    allLeads[index] = updatedLead;
+    saveLeads(allLeads);
+  }
 }
 
 export function addLeads(newLeads: Lead[]): void {

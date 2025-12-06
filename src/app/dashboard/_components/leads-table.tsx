@@ -23,6 +23,10 @@ import {
   Flame,
   Sun,
   Snowflake,
+  CheckCircle,
+  XCircle,
+  Circle,
+  HelpCircle,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
@@ -53,6 +57,35 @@ const scoreCategoryColors: Record<Lead['scoreCategory'], string> = {
   Cold: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700',
 };
 
+const statusStyles: Record<
+  Lead['status'],
+  {
+    icon: React.ReactNode;
+    className: string;
+  }
+> = {
+  New: {
+    icon: <Circle className="h-3 w-3" />,
+    className:
+      'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700',
+  },
+  Contacted: {
+    icon: <Mail className="h-3 w-3" />,
+    className:
+      'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-700',
+  },
+  Won: {
+    icon: <CheckCircle className="h-3 w-3" />,
+    className:
+      'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700',
+  },
+  Lost: {
+    icon: <XCircle className="h-3 w-3" />,
+    className:
+      'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/50 dark:text-gray-300 dark:border-gray-700',
+  },
+};
+
 const ScoreBadge: React.FC<{ category: Lead['scoreCategory'] }> = ({ category }) => {
   const icons = {
     Hot: <Flame className="h-3 w-3" />,
@@ -70,6 +103,15 @@ const ScoreBadge: React.FC<{ category: Lead['scoreCategory'] }> = ({ category })
   );
 };
 
+const StatusBadge: React.FC<{ status: Lead['status'] }> = ({ status }) => {
+  const style = statusStyles[status] || { icon: <HelpCircle className="h-3 w-3" />, className: '' };
+  return (
+    <Badge variant="outline" className={`flex items-center gap-1.5 ${style.className}`}>
+      {style.icon}
+      {status}
+    </Badge>
+  );
+};
 
 export default function LeadsTable({ leads }: { leads: Lead[] }) {
   const router = useRouter();
@@ -163,6 +205,7 @@ export default function LeadsTable({ leads }: { leads: Lead[] }) {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
+                <SortableHeader label="Status" sortKey="status" />
                 <SortableHeader label="Score" sortKey="score" />
                 <SortableHeader label="Category" sortKey="scoreCategory" />
                 <SortableHeader label="Source" sortKey="source" />
@@ -188,6 +231,9 @@ export default function LeadsTable({ leads }: { leads: Lead[] }) {
                         <div className="text-sm text-muted-foreground">{lead.company}</div>
                       </div>
                     </div>
+                  </TableCell>
+                   <TableCell>
+                    <StatusBadge status={lead.status} />
                   </TableCell>
                   <TableCell>
                     <div className="font-medium">{lead.score}</div>

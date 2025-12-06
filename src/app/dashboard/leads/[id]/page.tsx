@@ -1,7 +1,7 @@
 
 'use client';
 import { useState, useEffect } from 'react';
-import { getLeadById } from '@/lib/leads-service';
+import { getLeadById, updateLead } from '@/lib/leads-service';
 import type { Lead } from '@/lib/types';
 import { notFound } from 'next/navigation';
 import LeadHeader from './_components/lead-header';
@@ -20,6 +20,18 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
     const foundLead = getLeadById(params.id);
     setLead(foundLead);
   }, [params.id]);
+  
+  const handleStatusChange = (updatedLead: Lead) => {
+    setLead(updatedLead);
+  };
+  
+  const handleEmailSent = () => {
+    if (lead) {
+        const updatedLead = { ...lead, status: 'Contacted' as const };
+        updateLead(updatedLead);
+        setLead(updatedLead);
+    }
+  };
 
   if (lead === undefined) {
     return <div>Loading...</div>;
@@ -31,7 +43,7 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <LeadHeader lead={lead} />
+      <LeadHeader lead={lead} onStatusChange={handleStatusChange} />
       <Separator />
       <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
         <div className="lg:col-span-1 flex flex-col gap-6">
@@ -44,7 +56,7 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
             <TagsCard lead={lead} />
             {/* <UpsellCard lead={lead} /> */}
           </div>
-          <MessageGenerator lead={lead} />
+          <MessageGenerator lead={lead} onEmailSent={handleEmailSent} />
         </div>
       </div>
     </div>

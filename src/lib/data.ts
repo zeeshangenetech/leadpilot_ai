@@ -18,6 +18,7 @@ export const initialLeads: Lead[] = [
     linkedinProfile: 'https://linkedin.com/in/alicejohnson',
     website: 'https://innovateinc.com',
     recentActivity: 'Downloaded "Advanced Analytics" whitepaper.',
+    status: 'New',
   },
   {
     id: '2',
@@ -36,6 +37,7 @@ export const initialLeads: Lead[] = [
     linkedinProfile: 'https://linkedin.com/in/bobsmith',
     website: 'https://workforce.io',
     recentActivity: 'Attended "Future of Work" webinar.',
+    status: 'Contacted',
   },
   {
     id: '3',
@@ -54,6 +56,7 @@ export const initialLeads: Lead[] = [
     linkedinProfile: 'https://linkedin.com/in/charliebrown',
     website: 'https://creative.co',
     recentActivity: 'Visited pricing page.',
+    status: 'New',
   },
   {
     id: '4',
@@ -71,6 +74,7 @@ export const initialLeads: Lead[] = [
     purchaseHistory: [{ productId: 'prod_1', productName: 'Pro Plan', date: new Date(2023, 11, 15) }],
     website: 'https://justice.org',
     recentActivity: 'Clicked on "Get a Demo" link.',
+    status: 'Won',
   },
   {
     id: '5',
@@ -88,6 +92,7 @@ export const initialLeads: Lead[] = [
     purchaseHistory: [],
     linkedinProfile: 'https://linkedin.com/in/ethanhunt',
     recentActivity: 'Viewed "Enterprise Security" case study.',
+    status: 'Lost',
   },
   {
     id: '6',
@@ -104,6 +109,7 @@ export const initialLeads: Lead[] = [
     interactionCount: 1,
     purchaseHistory: [],
     recentActivity: 'Sent initial inquiry message.',
+    status: 'New',
   },
 ];
 
