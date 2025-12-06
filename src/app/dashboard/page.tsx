@@ -69,23 +69,23 @@ export default function DashboardPage() {
        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-main-pr">
               <LineChart className="h-5 w-5 text-muted-foreground" />
               <span>Leads by Category</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent >
             <LeadsByCategoryChart leads={leads} />
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-main-pr">
               <BarChart3 className="h-5 w-5 text-muted-foreground" />
               <span>Leads by Source</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="white-txt-wappper">
             <LeadsBySourceChart leads={leads} />
           </CardContent>
         </Card>

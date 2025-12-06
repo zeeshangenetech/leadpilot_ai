@@ -29,9 +29,9 @@ export function LeadsByCategoryChart({ leads }: { leads: Lead[] }) {
     );
 
     return [
-        { name: 'Hot', value: counts.Hot || 0, color: 'hsl(var(--destructive))' },
-        { name: 'Warm', value: counts.Warm || 0, color: 'hsl(var(--primary))' },
-        { name: 'Cold', value: counts.Cold || 0, color: 'hsl(var(--muted-foreground))' },
+        { name: 'Hot', value: counts.Hot || 0, color: '#4F46E5' },
+        { name: 'Warm', value: counts.Warm || 0, color: '#10B981' },
+        { name: 'Cold', value: counts.Cold || 0, color: '#06B6D4' },
     ].filter(d => d.value > 0);
   }, [leads]);
   

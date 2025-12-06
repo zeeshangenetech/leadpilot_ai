@@ -1,0 +1,16 @@
+.text-main-pr span{
+
+color: #5038BA;
+}
+
+.text-main-pr svg path{
+  stroke: #5038BA;
+}
+.white-txt-wappper svg text {
+    fill: #000;
+    font-weight: 600;
+}
+
+.wapper-text-white svg path {
+    fill: #fff;
+}
