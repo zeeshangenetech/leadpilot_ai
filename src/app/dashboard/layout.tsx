@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
+  LayoutDashboard,
   Users,
   Upload,
   Settings,
@@ -25,20 +26,12 @@ import {
 import { Logo } from '@/components/logo';
 import { Input } from '@/components/ui/input';
 
-const navItems = [
-  { href: '/dashboard', icon: Users, label: 'Leads' },
-  { href: '/dashboard/upload', icon: Upload, label: 'Upload Leads' },
-  { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
-];
-
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-
-  const isLeadsActive = pathname === '/dashboard' || pathname.startsWith('/dashboard/leads');
 
   return (
     <SidebarProvider>
@@ -48,13 +41,25 @@ export default function DashboardLayout({
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
+             <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/dashboard'}
+                tooltip={{children: 'Dashboard'}}
+              >
+                <Link href="/dashboard">
+                  <LayoutDashboard />
+                  <span>Dashboard</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
-                isActive={isLeadsActive}
+                isActive={pathname.startsWith('/dashboard/leads')}
                 tooltip={{children: 'Leads'}}
               >
-                <Link href="/dashboard">
+                <Link href="/dashboard/leads">
                   <Users />
                   <span>Leads</span>
                 </Link>
