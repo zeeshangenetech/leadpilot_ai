@@ -14,3 +14,17 @@ color: #5038BA;
 .wapper-text-white svg path {
     fill: #fff;
 }
+
+.recharts-legend-item-text {
+    text-transform: capitalize;
+}
+
+.total-lead{
+      box-shadow: 0px 1px 3px 0px #0000001A;
+    background: #2B7FFF1A;
+}
+
+.color_pr .font-medium{
+      color: #5038ba;
+      font-weight: 600;
+}
