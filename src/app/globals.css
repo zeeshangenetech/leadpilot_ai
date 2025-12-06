@@ -90,3 +90,31 @@ color: #5038BA;
 table tr th{
   color: #5038BA !important;
 }
+
+[data-sidebar="menu"] li [data-active="true"]{
+border-radius: 5px;
+    background: rgba(80, 56, 186, 1);
+    color: #fff !important;
+    height: 45px;
+}
+
+[data-sidebar="menu"] li a{
+  height: 45px;
+}
+[data-sidebar="menu"] li a:hover{
+border-radius: 5px;
+    background: rgba(80, 56, 186, 1);
+    color: #fff !important;
+    height: 45px;
+}
+
+
+[data-sidebar="menu"] li{
+  font-weight: 600;
+}
+
+div[data-sidebar="content"]{
+  margin-top: 20px;
+  display: flex;
+  gap:15px;
+}
