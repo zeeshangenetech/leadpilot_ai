@@ -60,7 +60,7 @@ export async function sendEmailAction(input: SendEmailInput): Promise<{ success:
             from: `"${smtpSettings.from.split('@')[0]}" <${smtpSettings.from}>`,
             to: to,
             subject: subject,
-            html: body.replace(/\n/g, '<br>'), // Simple conversion of newlines to <br> for HTML email
+            html: body.replace(/\n/g, '<br />'),
         });
         return { success: true };
     } catch (error) {

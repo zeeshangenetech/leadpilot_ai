@@ -38,7 +38,7 @@ export type GeneratePersonalizedOutboundMessageInput = z.infer<
 // This helps the model to return data in a consistent format.
 const GeneratePersonalizedOutboundMessageOutputSchema = z.object({
   subject: z.string().describe('Personalized email subject line'),
-  body: z.string().describe('Full email body ready to send'),
+  body: z.string().describe('Full email body ready to send, formatted with newline characters (\\n) for paragraphs.'),
   upsell_mention: z.string().describe('Text highlighting the upsell product/service'),
   cta: z.string().describe('Text for call-to-action'),
   suggested_channel: z.enum(['email']).describe('The suggested channel for the message.'),
@@ -101,12 +101,13 @@ Best regards,
 
 - Personalize the greeting, reference the lead description and platform, highlight the recommended product/service, suggest upsell services naturally, and include the CTA.  
 - Keep it concise (2–4 short paragraphs).  
-- Maintain a friendly professional tone.  
+- Maintain a friendly professional tone.
+- **IMPORTANT**: The generated 'body' of the email must be formatted with newline characters (\\n) to create paragraph breaks for proper HTML rendering.  
 
 Output format (JSON):
 {
 "subject": "Personalized email subject line",
-"body": "Full email body ready to send",
+"body": "Full email body ready to send, with \\n for paragraphs.",
 "upsell_mention": "Text highlighting the upsell product/service",
 "cta": "Text for call-to-action",
 "suggested_channel": "email"
