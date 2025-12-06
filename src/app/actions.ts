@@ -7,6 +7,8 @@ import {
 } from '@/ai/flows/generate-personalized-outbound-messages';
 import type { SmtpSettings } from '@/lib/settings-service';
 import nodemailer from 'nodemailer';
+import { generateUpsellSuggestions, type GenerateUpsellSuggestionsInput, type GenerateUpsellSuggestionsOutput } from '@/ai/flows/generate-upsell-suggestions';
+import { incrementMessagesSent } from '@/lib/stats-service';
 
 export async function generateMessageAction(
   input: GeneratePersonalizedOutboundMessageInput
@@ -60,11 +62,30 @@ export async function sendEmailAction(input: SendEmailInput): Promise<{ success:
             from: `"${smtpSettings.from.split('@')[0]}" <${smtpSettings.from}>`,
             to: to,
             subject: subject,
-            html: body.replace(/\n/g, '<br>'), // Simple conversion of newlines to <br> for HTML email
+            html: body.replace(/\n/g, '<br />'),
         });
+        // This is not a stateful server, so we can't reliably increment a counter here
+        // without a database. The client will have to manage this state.
+        // A better approach would be to return success and have the client update its state.
         return { success: true };
     } catch (error) {
         console.error('Error sending email:', error);
         return { success: false, error: 'Failed to send email.' };
     }
+}
+
+export async function generateUpsellSuggestionsAction(
+  input: GenerateUpsellSuggestionsInput
+): Promise<{ success: true; data: GenerateUpsellSuggestionsOutput } | { success: false; error: string }> {
+  try {
+    const result = await generateUpsellSuggestions(input);
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Error generating upsell suggestions:', error);
+    return {
+      success: false,
+      error:
+        'Failed to generate upsell suggestions. Please check the AI service configuration.',
+    };
+  }
 }

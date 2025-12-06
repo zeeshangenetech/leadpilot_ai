@@ -11,32 +11,26 @@ import LeadsTable from '../_components/leads-table';
 import { useToast } from '@/hooks/use-toast';
 import { addLeads } from '@/lib/leads-service';
 import { useRouter } from 'next/navigation';
+import { scoreLead } from '@/lib/scoring-service';
 
 type CsvRow = Record<string, any>;
 
 const detectSource = (headers: string[]): 'LinkedIn' | 'Upwork' | 'Freelancer' | 'Email' | 'Unknown' => {
   const lowerCaseHeaders = headers.map(h => h.toLowerCase());
-  // LinkedIn is very specific with its columns
   if (lowerCaseHeaders.includes('lead_id') && lowerCaseHeaders.includes('demand_signal/post_url')) return 'LinkedIn';
-  // Freelancer has avg_bid_usd
   if (lowerCaseHeaders.includes('job_id') && lowerCaseHeaders.includes('avg_bid_usd')) return 'Freelancer';
-  // Upwork has a bunch of specific columns
   if (lowerCaseHeaders.includes('job_id') && lowerCaseHeaders.includes('job_post_data/url') && lowerCaseHeaders.some(h => h.startsWith('client_engagement'))) return 'Upwork';
-  // Email has a more simple structure
-  if (lowerCaseHeaders.includes('received_date') && lowerCaseHeaders.includes('tech_stack_preference')) return 'Email';
+  if (lowerCaseHeaders.includes('received_date') && (lowerCaseHeaders.includes('name') || lowerCaseHeaders.includes('email'))) return 'Email';
   return 'Unknown';
 };
 
-const normalizeLinkedIn = (row: CsvRow, index: number): Lead => ({
+const normalizeLinkedIn = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation'> => ({
   id: row.lead_id || `temp-linkedin-${Date.now()}-${index}`,
   name: `${row['lead_profile/first_name'] || ''} ${row['lead_profile/last_name'] || ''}`.trim(),
   email: row['lead_profile/email'],
   company: row['company_profile/name'],
   avatar: `https://picsum.photos/seed/${row.lead_id || index}/100/100`,
   source: 'LinkedIn',
-  score: Math.floor(Math.random() * 60) + 40,
-  scoreCategory: ['Hot', 'Warm', 'Cold'][Math.floor(Math.random() * 3)] as 'Hot' | 'Warm' | 'Cold',
-  scoreExplanation: 'Score based on imported LinkedIn data.',
   lastActivity: new Date(row['demand_signal/post_date'] || Date.now()),
   tags: [
       row['demand_signal/project_type/0'],
@@ -49,18 +43,16 @@ const normalizeLinkedIn = (row: CsvRow, index: number): Lead => ({
   linkedinProfile: `https://linkedin.com/in/${row['lead_profile/first_name']?.toLowerCase()}${row['lead_profile/last_name']?.toLowerCase()}`,
   website: `https://${row['company_profile/name']?.toLowerCase().replace(/\s/g, '')}.com`,
   recentActivity: row['demand_signal/post_snippet'],
+  raw_data: row,
 });
 
-const normalizeUpwork = (row: CsvRow, index: number): Lead => ({
+const normalizeUpwork = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation'> => ({
   id: row.job_id || `temp-upwork-${Date.now()}-${index}`,
   name: `Upwork: ${row['job_post_data/title']}`.substring(0, 50),
   email: 'not-available@upwork.com',
   company: 'Upwork Client',
   avatar: `https://picsum.photos/seed/${row.job_id || index}/100/100`,
   source: 'Upwork',
-  score: Math.floor(Math.random() * 60) + 40,
-  scoreCategory: ['Hot', 'Warm', 'Cold'][Math.floor(Math.random() * 3)] as 'Hot' | 'Warm' | 'Cold',
-  scoreExplanation: 'Score based on imported Upwork data.',
   lastActivity: new Date(row['job_post_data/posted_date'] || Date.now()),
   tags: [
     row['job_post_data/project_type/0'],
@@ -70,56 +62,69 @@ const normalizeUpwork = (row: CsvRow, index: number): Lead => ({
   interactionCount: 1,
   purchaseHistory: [],
   recentActivity: row['job_post_data/description_snippet'],
+  raw_data: row,
 });
 
-const normalizeFreelancer = (row: CsvRow, index: number): Lead => ({
+const normalizeFreelancer = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation'> => ({
     id: row.job_id || `temp-freelancer-${Date.now()}-${index}`,
     name: `Freelancer: ${row.title}`.substring(0, 50),
     email: 'not-available@freelancer.com',
     company: 'Freelancer Client',
     avatar: `https://picsum.photos/seed/${row.job_id || index}/100/100`,
     source: 'Upwork', // Note: 'Freelancer' is not in the Lead['source'] type. Using 'Upwork'.
-    score: Math.floor(Math.random() * 60) + 40,
-    scoreCategory: ['Hot', 'Warm', 'Cold'][Math.floor(Math.random() * 3)] as 'Hot' | 'Warm' | 'Cold',
-    scoreExplanation: 'Score based on imported Freelancer data.',
     lastActivity: new Date(row.posted_date || Date.now()),
     tags: (row.project_focus?.split(',') || []).map((t: string) => t.trim()),
     interactionCount: 1,
     purchaseHistory: [],
     recentActivity: row.description_snippet,
+    raw_data: row,
 });
 
-const normalizeEmail = (row: CsvRow, index: number): Lead => ({
+const normalizeEmail = (row: CsvRow, index: number): Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation'> => ({
     id: `temp-email-${Date.now()}-${index}`,
     name: row.name || `Email Lead ${index + 1}`,
     email: row.email,
     company: row.company,
     avatar: `https://picsum.photos/seed/email${index}/100/100`,
     source: 'Email',
-    score: Math.floor(Math.random() * 60) + 40,
-    scoreCategory: ['Hot', 'Warm', 'Cold'][Math.floor(Math.random() * 3)] as 'Hot' | 'Warm' | 'Cold',
-    scoreExplanation: 'Score based on imported email data.',
     lastActivity: new Date(row.received_date || Date.now()),
     tags: (row.tech_stack_preference?.split(',') || []).map((t: string) => t.trim()),
     interactionCount: 1,
     purchaseHistory: [],
     recentActivity: row.message,
+    raw_data: row,
 });
 
 const normalizeRow = (source: 'LinkedIn' | 'Upwork' | 'Freelancer' | 'Email' | 'Unknown', row: CsvRow, index: number): Lead | null => {
     try {
+        let normalizedData: Omit<Lead, 'score' | 'scoreCategory' | 'scoreExplanation'> | null = null;
         switch (source) {
             case 'LinkedIn':
-                return normalizeLinkedIn(row, index);
+                normalizedData = normalizeLinkedIn(row, index);
+                break;
             case 'Upwork':
-                return normalizeUpwork(row, index);
+                normalizedData = normalizeUpwork(row, index);
+                break;
             case 'Freelancer':
-                return normalizeFreelancer(row, index);
+                normalizedData = normalizeFreelancer(row, index);
+                break;
             case 'Email':
-                return normalizeEmail(row, index);
+                normalizedData = normalizeEmail(row, index);
+                break;
             default:
                 return null;
         }
+        
+        if (!normalizedData) return null;
+
+        // Add scoring
+        const scoringResult = scoreLead(normalizedData as Lead);
+
+        return {
+            ...normalizedData,
+            ...scoringResult
+        };
+
     } catch (e) {
         console.error(`Error normalizing row ${index} for source ${source}:`, e);
         return null;
@@ -148,7 +153,7 @@ export default function UploadPage() {
         complete: (results) => {
           const headers = results.meta.fields || [];
           const source = detectSource(headers);
-
+          
           if (source === 'Unknown') {
             setIsParsing(false);
             toast({

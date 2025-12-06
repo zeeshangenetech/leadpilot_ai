@@ -7,10 +7,11 @@ import { notFound } from 'next/navigation';
 import LeadHeader from './_components/lead-header';
 import LeadInfoCard from './_components/lead-info-card';
 import ScoreCard from './_components/score-card';
-import UpsellCard from './_components/upsell-card';
+// import UpsellCard from './_components/upsell-card';
 import MessageGenerator from './_components/message-generator';
 import ActivityFeed from './_components/activity-feed';
 import { Separator } from '@/components/ui/separator';
+import TagsCard from './_components/tags-card';
 
 export default function LeadDetailPage({ params }: { params: { id: string } }) {
   const [lead, setLead] = useState<Lead | null | undefined>(undefined);
@@ -40,7 +41,8 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
         <div className="lg:col-span-3 flex flex-col gap-6">
           <div className="grid gap-6 md:grid-cols-2">
             <ScoreCard lead={lead} />
-            <UpsellCard leadId={lead.id} />
+            <TagsCard lead={lead} />
+            {/* <UpsellCard lead={lead} /> */}
           </div>
           <MessageGenerator lead={lead} />
         </div>

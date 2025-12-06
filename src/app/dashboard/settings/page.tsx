@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { deleteAllLeads } from '@/lib/leads-service';
 import { useRouter } from 'next/navigation';
+import { resetStats } from '@/lib/stats-service';
 
 const formSchema = z.object({
   host: z.string().min(1, 'Host is required.'),
@@ -77,16 +78,18 @@ export default function SettingsPage() {
     try {
       await new Promise(resolve => setTimeout(resolve, 500)); // Simulate async operation
       deleteAllLeads();
+      resetStats();
       toast({
         title: 'Data Deleted',
-        description: 'All lead data has been successfully deleted.',
+        description: 'All lead and statistical data has been successfully deleted.',
       });
-      router.push('/dashboard');
+      // Force a reload to ensure all state is cleared
+      window.location.href = '/dashboard';
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not delete lead data.',
+        description: 'Could not delete data.',
       });
     } finally {
       setIsDeleting(false);
@@ -210,7 +213,7 @@ export default function SettingsPage() {
                         <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete all of your lead data from your browser&apos;s local storage.
+                            This action cannot be undone. This will permanently delete all of your lead data and reset message counts from your browser&apos;s local storage.
                         </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
+  LayoutDashboard,
   Users,
   Upload,
   Settings,
@@ -25,20 +26,12 @@ import {
 import { Logo } from '@/components/logo';
 import { Input } from '@/components/ui/input';
 
-const navItems = [
-  { href: '/dashboard', icon: Users, label: 'Leads' },
-  { href: '/dashboard/upload', icon: Upload, label: 'Upload Leads' },
-  { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
-];
-
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-
-  const isLeadsActive = pathname === '/dashboard' || pathname.startsWith('/dashboard/leads');
 
   return (
     <SidebarProvider>
@@ -48,13 +41,25 @@ export default function DashboardLayout({
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
+             <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/dashboard'}
+                tooltip={{children: 'Dashboard'}}
+              >
+                <Link href="/dashboard">
+                  <LayoutDashboard />
+                  <span>Dashboard</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
-                isActive={isLeadsActive}
+                isActive={pathname.startsWith('/dashboard/leads')}
                 tooltip={{children: 'Leads'}}
               >
-                <Link href="/dashboard">
+                <Link href="/dashboard/leads">
                   <Users />
                   <span>Leads</span>
                 </Link>
@@ -92,11 +97,11 @@ export default function DashboardLayout({
               <div className="flex items-center gap-3 px-2 py-3">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src="https://picsum.photos/seed/user/40/40" data-ai-hint="person" />
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarFallback>SS</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col truncate group-data-[state=collapsed]:hidden">
-                  <span className="font-semibold text-sm text-sidebar-foreground truncate">John Doe</span>
-                  <span className="text-xs text-sidebar-foreground/70 truncate">john.doe@example.com</span>
+                  <span className="font-semibold text-sm text-sidebar-foreground truncate">Syntax Squad</span>
+                  <span className="text-xs text-sidebar-foreground/70 truncate">admin@syntaxsquad.com</span>
                 </div>
               </div>
             </SidebarMenuItem>
@@ -120,7 +125,7 @@ export default function DashboardLayout({
             </Button>
             <Avatar className="h-9 w-9 hidden md:flex">
               <AvatarImage src="https://picsum.photos/seed/user-avatar/36/36" data-ai-hint="person" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarFallback>SS</AvatarFallback>
             </Avatar>
           </div>
         </header>

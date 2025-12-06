@@ -15,10 +15,11 @@ export type Lead = {
   linkedinProfile?: string;
   website?: string;
   recentActivity: string;
+  raw_data?: Record<string, any>; // To store original data for scoring
 };
 
 export type UpsellSuggestion = {
-  id: string;
+  id?: string;
   productName: string;
   reason: string;
   confidence: number; // 0-1
