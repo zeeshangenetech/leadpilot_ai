@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import type { Lead, UpsellSuggestion } from '@/lib/types';
@@ -39,25 +40,25 @@ export default function UpsellCard({ lead }: { lead: Lead }) {
 
   useEffect(() => {
     async function fetchSuggestions() {
-      setIsLoading(true);
-      const result = await generateUpsellSuggestionsAction({
-        company: lead.company || 'their company',
-        recentActivity: lead.recentActivity,
-        existingServices: lead.purchaseHistory.map(p => p.productName),
-      });
+      // setIsLoading(true);
+      // const result = await generateUpsellSuggestionsAction({
+      //   company: lead.company || 'their company',
+      //   recentActivity: lead.recentActivity,
+      //   existingServices: lead.purchaseHistory.map(p => p.productName),
+      // });
 
-      if (result.success && result.data) {
-        setSuggestions(result.data.suggestions);
-      } else {
-        toast({
-            variant: 'destructive',
-            title: 'Failed to get suggestions',
-            description: result.error,
-        });
-      }
-      setIsLoading(false);
+      // if (result.success && result.data) {
+      //   setSuggestions(result.data.suggestions);
+      // } else {
+      //   toast({
+      //       variant: 'destructive',
+      //       title: 'Failed to get suggestions',
+      //       description: result.error,
+      //   });
+      // }
+      // setIsLoading(false);
     }
-    fetchSuggestions();
+    // fetchSuggestions();
   }, [lead, toast]);
 
   return (
