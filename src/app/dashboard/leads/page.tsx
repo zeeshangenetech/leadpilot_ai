@@ -26,10 +26,10 @@ export default function LeadsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Leads</h1>
         <div className="flex items-center gap-2">
-          <Button variant="outline">
+          {/* <Button variant="outline">
             <FileDown className="mr-2 h-4 w-4" />
             Export
-          </Button>
+          </Button> */}
           <Button asChild>
             <Link href="/dashboard/upload">
               <PlusCircle className="mr-2 h-4 w-4" />
