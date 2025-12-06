@@ -20,18 +20,15 @@ import {z} from 'genkit';
 // Defines the input structure for our AI flow using a Zod schema.
 // This ensures that the data passed to the flow is well-structured.
 const GeneratePersonalizedOutboundMessageInputSchema = z.object({
-  name: z.string().describe('The name of the lead.'),
-  company: z.string().describe('The company of the lead.'),
-  activity: z.string().describe('The recent activity of the lead.'),
-  score: z.number().describe('The lead score.'),
-  category: z.string().describe('The lead score category (Hot, Warm, Cold).'),
-  product: z.string().describe('The recommended product or service.'),
-  reason: z.string().describe('The reason for the product recommendation.'),
-  upsell: z.string().optional().describe('Optional upsell opportunity.'),
-  tone: z
-    .enum(['friendly', 'professional'])
-    .describe('The desired tone of the message.'),
-  channel: z.enum(['email', 'WhatsApp']).describe('The desired channel.'),
+  CustomerName: z.string().describe('The name of the lead.'),
+  CompanyName: z.string().describe('The company of the lead.'),
+  LeadDescription: z.string().describe('The recent activity or description of the lead.'),
+  Platform: z.string().describe('The source platform of the lead (e.g., LinkedIn, Upwork).'),
+  Product: z.string().describe('The recommended product or service.'),
+  Reason: z.string().describe('The reason for the product recommendation.'),
+  Upsell: z.string().optional().describe('Optional upsell opportunity.'),
+  CTA: z.string().describe('The desired call to action.'),
+  EmailSignature: z.string().describe('The email signature to be used.'),
 });
 export type GeneratePersonalizedOutboundMessageInput = z.infer<
   typeof GeneratePersonalizedOutboundMessageInputSchema
@@ -40,16 +37,11 @@ export type GeneratePersonalizedOutboundMessageInput = z.infer<
 // Defines the expected JSON output structure from the AI model.
 // This helps the model to return data in a consistent format.
 const GeneratePersonalizedOutboundMessageOutputSchema = z.object({
-  subject: z.string().describe('Personalized subject line for email.'),
-  body: z
-    .string()
-    .describe('Main message body including the upsell suggestion.'),
-  variant_2: z
-    .string()
-    .describe('Alternate message body with different wording or approach.'),
-  suggested_channel: z
-    .enum(['email', 'whatsapp'])
-    .describe('The suggested channel for the message.'),
+  subject: z.string().describe('Personalized email subject line'),
+  body: z.string().describe('Full email body ready to send'),
+  upsell_mention: z.string().describe('Text highlighting the upsell product/service'),
+  cta: z.string().describe('Text for call-to-action'),
+  suggested_channel: z.enum(['email']).describe('The suggested channel for the message.'),
 });
 export type GeneratePersonalizedOutboundMessageOutput = z.infer<
   typeof GeneratePersonalizedOutboundMessageOutputSchema
@@ -75,29 +67,49 @@ const generatePersonalizedOutboundMessagePrompt = ai.definePrompt({
   output: {schema: GeneratePersonalizedOutboundMessageOutputSchema},
   // The core prompt string that guides the AI's response.
   // It uses Handlebars syntax (e.g., {{name}}) to insert the lead's data.
-  prompt: `You are an expert sales assistant for a software company. Your task is to generate a **personalized outbound message** for a lead, including a friendly upsell suggestion for our software services.
+  prompt: `You are an expert sales assistant for a software company called "The Syntax Squad". Your task is to generate a **personalized email** for a specific lead using the following template as guidance. The email should sound professional, friendly, and tailored to the lead’s business and requirements. Include an optional upsell suggestion based on their needs.
 
-Lead Details:
-- Name: {{name}}
-- Company: {{company}}
-- Recent activity: {{activity}}
-- Lead score: {{score}} ({{category}})
-- Recommended product/service: {{product}} (reason: {{reason}})
-- Upsell opportunity: {{upsell}} (optional; additional software services that could benefit the client)
+Lead Information:
+- Name: {{CustomerName}}
+- Company: {{CompanyName}}
+- Lead description / notes: {{LeadDescription}}
+- Source platform: {{Platform}} (e.g., LinkedIn, Upwork, Email)
+- Recommended product/service: {{Product}} (reason: {{Reason}})
+- Upsell opportunity: {{Upsell}} (optional; additional software services we can offer)
+- Call to action: {{CTA}} (e.g., "Would you like to schedule a demo?", "Can we set up a quick call?", "Let us show you how it works?")
 
 Requirements:
-- Tone: {{tone}}
-- Channel: {{channel}}
-- Message length: 2–4 sentences
-- Include the upsell naturally, highlighting value or complementary benefits
-- Provide at least **2 variants** for A/B testing
+- Use the provided email template as a base:  
 
-Return JSON in this format:
+Hi {{CustomerName}},
+
+I hope you’re doing well.
+
+At The Syntax Squad, we’re always looking for ways to support businesses with solutions that create real impact. To understand your needs better, we’d love to know:
+
+• What challenges or pain points are you currently facing?
+• What kind of solution are you looking for to overcome them?
+
+Your input helps us recommend the right approach and tailor a solution that truly fits your workflow.
+
+If you’d like, our team can also walk you through how similar businesses have used our services to streamline operations, reduce manual work, and improve overall efficiency.
+
+Looking forward to hearing from you!
+
+Best regards,
+{{EmailSignature}}
+
+- Personalize the greeting, reference the lead description and platform, highlight the recommended product/service, suggest upsell services naturally, and include the CTA.  
+- Keep it concise (2–4 short paragraphs).  
+- Maintain a friendly professional tone.  
+
+Output format (JSON):
 {
-  "subject": "Personalized subject line for email",
-  "body": "Main message body including the upsell suggestion",
-  "variant_2": "Alternate message body with different wording or approach",
-  "suggested_channel": "email|whatsapp"
+"subject": "Personalized email subject line",
+"body": "Full email body ready to send",
+"upsell_mention": "Text highlighting the upsell product/service",
+"cta": "Text for call-to-action",
+"suggested_channel": "email"
 }
   `,
 });
