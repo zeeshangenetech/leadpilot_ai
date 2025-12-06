@@ -1,10 +1,12 @@
 'use server';
-
+import 'server-only';
 import {
   generatePersonalizedOutboundMessage,
   type GeneratePersonalizedOutboundMessageInput,
   type GeneratePersonalizedOutboundMessageOutput,
 } from '@/ai/flows/generate-personalized-outbound-messages';
+import type { SmtpSettings } from '@/lib/settings-service';
+import nodemailer from 'nodemailer';
 
 export async function generateMessageAction(
   input: GeneratePersonalizedOutboundMessageInput
@@ -20,4 +22,49 @@ export async function generateMessageAction(
         'Failed to generate message. Please check the AI service configuration.',
     };
   }
+}
+
+export type SendEmailInput = {
+    smtpSettings: SmtpSettings;
+    to: string;
+    subject: string;
+    body: string;
+}
+
+export async function sendEmailAction(input: SendEmailInput): Promise<{ success: boolean; error?: string }> {
+    const { smtpSettings, to, subject, body } = input;
+    
+    if (!smtpSettings || !smtpSettings.host || !smtpSettings.port || !smtpSettings.user || !smtpSettings.pass) {
+        return { success: false, error: "SMTP settings are not configured. Please configure them in the settings page." };
+    }
+
+    const transporter = nodemailer.createTransport({
+        host: smtpSettings.host,
+        port: smtpSettings.port,
+        secure: smtpSettings.port === 465, // true for 465, false for other ports
+        auth: {
+            user: smtpSettings.user,
+            pass: smtpSettings.pass,
+        },
+    });
+
+    try {
+        await transporter.verify();
+    } catch (error) {
+        console.error('Error verifying SMTP transporter:', error);
+        return { success: false, error: 'Failed to connect to SMTP server. Please check your credentials.' };
+    }
+
+    try {
+        await transporter.sendMail({
+            from: `"${smtpSettings.from.split('@')[0]}" <${smtpSettings.from}>`,
+            to: to,
+            subject: subject,
+            html: body.replace(/\n/g, '<br>'), // Simple conversion of newlines to <br> for HTML email
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error sending email:', error);
+        return { success: false, error: 'Failed to send email.' };
+    }
 }

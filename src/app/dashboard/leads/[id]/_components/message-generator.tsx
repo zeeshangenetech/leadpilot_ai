@@ -11,10 +11,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { generateMessageAction } from '@/app/actions';
+import { generateMessageAction, sendEmailAction } from '@/app/actions';
 import { BotMessageSquare, Copy, Send, Loader2, Mail, MessageSquare } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getSettings } from '@/lib/settings-service';
 
 const formSchema = z.object({
   tone: z.enum(['friendly', 'professional'], {
@@ -25,9 +26,18 @@ const formSchema = z.object({
   }),
 });
 
+type GeneratedMessage = {
+    subject: string;
+    body: string;
+    variant_2: string;
+}
+
 export default function MessageGenerator({ lead }: { lead: Lead }) {
-  const [generatedMessage, setGeneratedMessage] = useState<{subject: string; body: string; variant_2: string} | null>(null);
+  const [generatedMessage, setGeneratedMessage] = useState<GeneratedMessage | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [activeTab, setActiveTab] = useState('variant1');
+
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -80,6 +90,52 @@ export default function MessageGenerator({ lead }: { lead: Lead }) {
         title: 'Copied to clipboard!',
     });
   };
+
+  const handleSendMessage = async () => {
+    if (!generatedMessage) return;
+
+    const channel = form.getValues('channel');
+    if (channel === 'WhatsApp') {
+        const messageBody = activeTab === 'variant1' ? generatedMessage.body : generatedMessage.variant_2;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(messageBody)}`;
+        window.open(whatsappUrl, '_blank');
+        return;
+    }
+
+    setIsSending(true);
+    const settings = getSettings();
+    if (!settings.smtp) {
+      toast({
+        variant: 'destructive',
+        title: 'SMTP Settings Missing',
+        description: 'Please configure your SMTP settings on the Settings page before sending emails.',
+      });
+      setIsSending(false);
+      return;
+    }
+
+    const result = await sendEmailAction({
+      smtpSettings: settings.smtp,
+      to: lead.email,
+      subject: generatedMessage.subject,
+      body: activeTab === 'variant1' ? generatedMessage.body : generatedMessage.variant_2,
+    });
+
+    if (result.success) {
+      toast({
+        title: 'Email Sent!',
+        description: `Message sent to ${lead.name}.`,
+      });
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Failed to Send Email',
+        description: result.error,
+      });
+    }
+    setIsSending(false);
+  };
+
 
   return (
     <Card>
@@ -178,7 +234,7 @@ export default function MessageGenerator({ lead }: { lead: Lead }) {
         )}
 
         {generatedMessage && (
-          <Tabs defaultValue="variant1" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">Generated Message</h3>
                 <TabsList>
@@ -214,8 +270,8 @@ export default function MessageGenerator({ lead }: { lead: Lead }) {
                     </div>
                 </div>
             </TabsContent>
-             <Button className="mt-4">
-              <Send className="mr-2 h-4 w-4" />
+             <Button className="mt-4" onClick={handleSendMessage} disabled={isSending}>
+              {isSending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
               Send Message
             </Button>
           </Tabs>
